@@ -57,10 +57,32 @@ fun procesarPromedios(archivos: List<String>, indiceColumna: Int): Map<String, D
 fun main() {
     println("Iniciando Laboratorio de Datos...")
 
-    // A. Pon aquí los nombres de tus 6 archivos de cada cosa (Aquí puse 1 de ejemplo)
-    val archivosTemp = listOf("350028_202504_Temperatura.csv" /*, "mayo.csv", "junio.csv"... */)
-    val archivosViento = listOf("350028_202504_Viento.csv")
-    val archivosHumedad = listOf("350028_202504_PresionHumedad.csv")
+    val archivosTemp = listOf(
+        "Temp 2025/350028_202504_Temperatura.csv",
+        "Temp 2025/350028_202505_Temperatura.csv",
+        "Temp 2025/350028_202506_Temperatura.csv",
+        "Temp 2025/350028_202507_Temperatura.csv",
+        "Temp 2025/350028_202508_Temperatura.csv",
+        "Temp 2025/350028_202509_Temperatura.csv"
+    )
+
+    val archivosViento = listOf(
+        "Viento 2025/350028_202504_Viento.csv",
+        "Viento 2025/350028_202505_Viento.csv",
+        "Viento 2025/350028_202506_Viento.csv",
+        "Viento 2025/350028_202507_Viento.csv",
+        "Viento 2025/350028_202508_Viento.csv",
+        "Viento 2025/350028_202509_Viento.csv"
+    )
+
+    val archivosHumedad = listOf(
+        "Presion y Humedad 2025/350028_202504_PresionHumedad.csv",
+        "Presion y Humedad 2025/350028_202505_PresionHumedad.csv",
+        "Presion y Humedad 2025/350028_202506_PresionHumedad.csv",
+        "Presion y Humedad 2025/350028_202507_PresionHumedad.csv",
+        "Presion y Humedad 2025/350028_202508_PresionHumedad.csv",
+        "Presion y Humedad 2025/350028_202509_PresionHumedad.csv"
+    )
 
     println("Comprimiendo miles de registros de la DMC a datos diarios...")
     val mapaTempMin = procesarTemperatura(archivosTemp)
