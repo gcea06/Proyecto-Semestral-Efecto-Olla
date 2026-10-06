@@ -53,6 +53,62 @@ fun procesarPromedios(archivos: List<String>, indiceColumna: Int): Map<String, D
     return datosPorDia.mapValues { it.value.average() }
 }
 
+// 5. El Algoritmo de Inteligencia Artificial (Descenso de Gradiente)
+fun entrenarModelo(datos: List<RegistroEntrenamiento>) {
+    println("\n=== INICIANDO ENTRENAMIENTO DEL MODELO ===")
+    println("Procesando ${datos.size} días de historial...")
+
+    // 1. Empezamos con pesos en cero (El modelo no sabe nada aún)
+    var pesoTemp = 0.0
+    var pesoViento = 0.0
+    var pesoHumedad = 0.0
+    var constanteBase = 0.0
+
+    // 2. Configuramos cómo va a aprender
+    val tasaAprendizaje = 0.00001 // Qué tan rápido cambia de opinión (Si es muy alto, se vuelve loco)
+    val epocas = 50000 // Cuántas veces va a repasar el historial completo
+
+    // 3. Empieza a estudiar
+    for (epoca in 1..epocas) {
+        var errorTotal = 0.0
+
+        for (registro in datos) {
+            // A. Intenta adivinar el humo de ese día con su fórmula actual
+            val prediccion = constanteBase +
+                    (pesoTemp * registro.tempMin) +
+                    (pesoViento * registro.vientoPromedio) +
+                    (pesoHumedad * registro.humedadPromedio)
+
+            // B. Calcula qué tan equivocado estaba comparado al SINCA real
+            val error = prediccion - registro.mp25
+            errorTotal += error * error // Se eleva al cuadrado para castigar los errores grandes
+
+            // C. ¡Aprende! Corrige sus pesos ligeramente en la dirección correcta
+            constanteBase -= tasaAprendizaje * error
+            pesoTemp -= tasaAprendizaje * error * registro.tempMin
+            pesoViento -= tasaAprendizaje * error * registro.vientoPromedio
+            pesoHumedad -= tasaAprendizaje * error * registro.humedadPromedio
+        }
+
+        // Cada 10.000 repasadas, nos avisa cómo va su nivel de error
+        if (epoca % 10000 == 0) {
+            println("Época $epoca -> Nivel de Error (MSE): ${String.format("%.2f", errorTotal / datos.size)}")
+        }
+    }
+
+    println("\n=== ¡ENTRENAMIENTO FINALIZADO! ===")
+    println("El modelo ha descubierto la fórmula del Efecto Olla para Talca.")
+    println("Copia estos números para tu programa final (AlertaEnVivo.kt):\n")
+
+    println("val constanteBase = $constanteBase")
+    println("val pesoTemperatura = $pesoTemp")
+    println("val pesoViento = $pesoViento")
+    println("val pesoHumedad = $pesoHumedad")
+
+    println("\nLa fórmula matemática resultante es:")
+    println("MP2.5 = $constanteBase + ($pesoTemp * Temperatura) + ($pesoViento * Viento) + ($pesoHumedad * Humedad)")
+}
+
 // 4. El Gran Cruce de Datos
 fun main() {
     println("Iniciando Laboratorio de Datos...")
