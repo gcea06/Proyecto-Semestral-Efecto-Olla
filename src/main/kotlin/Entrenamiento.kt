@@ -182,8 +182,8 @@ fun main() {
     }
 
     // C. Verificamos el éxito
-    println("\n¡ÉXITO! Se generaron ${registrosFinales.size} días completos para entrenar el modelo.")
-    println("Muestra de los primeros 3 días:")
+    println("\nEXITO! Se generaron ${registrosFinales.size} dias completos para entrenar el modelo.")
+    println("Muestra de los primeros 3 dias:")
     registrosFinales.take(3).forEach { reg ->
         println("Día: ${reg.fecha} | MP2.5: ${reg.mp25} | T.Min: ${String.format("%.1f", reg.tempMin)}°C | Viento: ${String.format("%.1f", reg.vientoPromedio)} | Humedad: ${String.format("%.1f", reg.humedadPromedio)}%")
     }
