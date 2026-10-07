@@ -1,6 +1,6 @@
 import java.io.File
 
-// 1. El molde final para tu Inteligencia Artificial
+// El molde final para tu Inteligencia Artificial
 data class RegistroEntrenamiento(
     val fecha: String,
     val mp25: Double,
@@ -9,54 +9,48 @@ data class RegistroEntrenamiento(
     val humedadPromedio: Double
 )
 
-// 2. Función para procesar archivos de Temperatura (Buscamos la MÍNIMA del día)
-fun procesarTemperatura(archivos: List<String>): Map<String, Double> {
+// Función dinámica que busca la columna por su nombre exacto
+fun procesarColumnaDinamica(archivos: List<String>, nombreColumna: String, esMinima: Boolean): Map<String, Double> {
     val datosPorDia = mutableMapOf<String, MutableList<Double>>()
 
     for (ruta in archivos) {
         File(ruta).useLines { lineas ->
-            lineas.drop(1).forEach { linea ->
-                val columnas = linea.split(";")
-                if (columnas.size > 5) {
-                    val fecha = columnas[3].substringBefore(" ") // Corta "2025-04-01 00:00:00" a "2025-04-01"
-                    val temp = columnas[5].toDoubleOrNull()
-                    if (temp != null) {
-                        datosPorDia.getOrPut(fecha) { mutableListOf() }.add(temp)
+            val iterador = lineas.iterator()
+            if (!iterador.hasNext()) return@useLines // Salta si el archivo está vacío
+
+            // Lee la primera línea (cabecera) y busca los índices reales
+            val cabecera = iterador.next().split(";")
+            val indiceDato = cabecera.indexOf(nombreColumna)
+            val indiceMomento = cabecera.indexOf("momento")
+
+            // Si encontró ambas columnas, procesa el resto del archivo
+            if (indiceDato != -1 && indiceMomento != -1) {
+                iterador.forEachRemaining { linea ->
+                    val columnas = linea.split(";")
+                    if (columnas.size > maxOf(indiceDato, indiceMomento)) {
+                        val fecha = columnas[indiceMomento].substringBefore(" ")
+                        val valor = columnas[indiceDato].toDoubleOrNull()
+                        if (valor != null) {
+                            datosPorDia.getOrPut(fecha) { mutableListOf() }.add(valor)
+                        }
                     }
                 }
             }
         }
     }
-    // Agrupamos y sacamos el valor mínimo de cada día (¡El detonante del Efecto Olla!)
-    return datosPorDia.mapValues { it.value.minOrNull() ?: 0.0 }
-}
 
-// 3. Función para procesar Viento y Humedad (Buscamos el PROMEDIO del día)
-fun procesarPromedios(archivos: List<String>, indiceColumna: Int): Map<String, Double> {
-    val datosPorDia = mutableMapOf<String, MutableList<Double>>()
-
-    for (ruta in archivos) {
-        File(ruta).useLines { lineas ->
-            lineas.drop(1).forEach { linea ->
-                val columnas = linea.split(";")
-                if (columnas.size > indiceColumna) {
-                    val fecha = columnas[3].substringBefore(" ")
-                    val valor = columnas[indiceColumna].toDoubleOrNull()
-                    if (valor != null) {
-                        datosPorDia.getOrPut(fecha) { mutableListOf() }.add(valor)
-                    }
-                }
-            }
-        }
+    // Devuelve el mínimo diario o el promedio según lo que pida la variable
+    return if (esMinima) {
+        datosPorDia.mapValues { it.value.minOrNull() ?: 0.0 }
+    } else {
+        datosPorDia.mapValues { it.value.average() }
     }
-    // Agrupamos y sacamos el promedio matemático del día
-    return datosPorDia.mapValues { it.value.average() }
 }
 
-// 5. El Algoritmo de Inteligencia Artificial (Descenso de Gradiente)
+// El Algoritmo de Inteligencia Artificial (Descenso de Gradiente)
 fun entrenarModelo(datos: List<RegistroEntrenamiento>) {
     println("\n=== INICIANDO ENTRENAMIENTO DEL MODELO ===")
-    println("Procesando ${datos.size} días de historial...")
+    println("Procesando ${datos.size} dias de historial...")
 
     // 1. Empezamos con pesos en cero (El modelo no sabe nada aún)
     var pesoTemp = 0.0
@@ -65,7 +59,7 @@ fun entrenarModelo(datos: List<RegistroEntrenamiento>) {
     var constanteBase = 0.0
 
     // 2. Configuramos cómo va a aprender
-    val tasaAprendizaje = 0.00001 // Qué tan rápido cambia de opinión (Si es muy alto, se vuelve loco)
+    val tasaAprendizaje = 0.000001 // Qué tan rápido cambia de opinión (Si es muy alto, se vuelve loco)
     val epocas = 50000 // Cuántas veces va a repasar el historial completo
 
     // 3. Empieza a estudiar
@@ -92,24 +86,24 @@ fun entrenarModelo(datos: List<RegistroEntrenamiento>) {
 
         // Cada 10.000 repasadas, nos avisa cómo va su nivel de error
         if (epoca % 10000 == 0) {
-            println("Época $epoca -> Nivel de Error (MSE): ${String.format("%.2f", errorTotal / datos.size)}")
+            println("Epoca $epoca -> Nivel de Error (MSE): ${String.format("%.2f", errorTotal / datos.size)}")
         }
     }
 
-    println("\n=== ¡ENTRENAMIENTO FINALIZADO! ===")
-    println("El modelo ha descubierto la fórmula del Efecto Olla para Talca.")
-    println("Copia estos números para tu programa final (AlertaEnVivo.kt):\n")
+    println("\n=== ENTRENAMIENTO FINALIZADO! ===")
+    println("El modelo ha descubierto la formula del Efecto Olla para Talca.")
+    println("Copia estos numeros para tu programa final (AlertaEnVivo.kt):\n")
 
     println("val constanteBase = $constanteBase")
     println("val pesoTemperatura = $pesoTemp")
     println("val pesoViento = $pesoViento")
     println("val pesoHumedad = $pesoHumedad")
 
-    println("\nLa fórmula matemática resultante es:")
+    println("\nLa formula matematica resultante es:")
     println("MP2.5 = $constanteBase + ($pesoTemp * Temperatura) + ($pesoViento * Viento) + ($pesoHumedad * Humedad)")
 }
 
-// 4. El Gran Cruce de Datos
+// El Cruce de Datos
 fun main() {
     println("Iniciando Laboratorio de Datos...")
 
@@ -119,7 +113,19 @@ fun main() {
         "Temp 2025/350028_202506_Temperatura.csv",
         "Temp 2025/350028_202507_Temperatura.csv",
         "Temp 2025/350028_202508_Temperatura.csv",
-        "Temp 2025/350028_202509_Temperatura.csv"
+        "Temp 2025/350028_202509_Temperatura.csv",
+        "Temp 2024/350028_202404_Temperatura.csv",
+        "Temp 2024/350028_202405_Temperatura.csv",
+        "Temp 2024/350028_202406_Temperatura.csv",
+        "Temp 2024/350028_202407_Temperatura.csv",
+        "Temp 2024/350028_202408_Temperatura.csv",
+        "Temp 2024/350028_202409_Temperatura.csv",
+        "Temp 2023/350028_202304_Temperatura.csv",
+        "Temp 2023/350028_202305_Temperatura.csv",
+        "Temp 2023/350028_202306_Temperatura.csv",
+        "Temp 2023/350028_202307_Temperatura.csv",
+        "Temp 2023/350028_202308_Temperatura.csv",
+        "Temp 2023/350028_202309_Temperatura.csv"
     )
 
     val archivosViento = listOf(
@@ -128,7 +134,19 @@ fun main() {
         "Viento 2025/350028_202506_Viento.csv",
         "Viento 2025/350028_202507_Viento.csv",
         "Viento 2025/350028_202508_Viento.csv",
-        "Viento 2025/350028_202509_Viento.csv"
+        "Viento 2025/350028_202509_Viento.csv",
+        "Viento 2024/350028_202404_Viento.csv",
+        "Viento 2024/350028_202405_Viento.csv",
+        "Viento 2024/350028_202406_Viento.csv",
+        "Viento 2024/350028_202407_Viento.csv",
+        "Viento 2024/350028_202408_Viento.csv",
+        "Viento 2024/350028_202409_Viento.csv",
+        "Viento 2023/350028_202304_Viento.csv",
+        "Viento 2023/350028_202305_Viento.csv",
+        "Viento 2023/350028_202306_Viento.csv",
+        "Viento 2023/350028_202307_Viento.csv",
+        "Viento 2023/350028_202308_Viento.csv",
+        "Viento 2023/350028_202309_Viento.csv"
     )
 
     val archivosHumedad = listOf(
@@ -137,44 +155,64 @@ fun main() {
         "Presion y Humedad 2025/350028_202506_PresionHumedad.csv",
         "Presion y Humedad 2025/350028_202507_PresionHumedad.csv",
         "Presion y Humedad 2025/350028_202508_PresionHumedad.csv",
-        "Presion y Humedad 2025/350028_202509_PresionHumedad.csv"
+        "Presion y Humedad 2025/350028_202509_PresionHumedad.csv",
+        "Presion y Humedad 2024/350028_202404_PresionHumedad.csv",
+        "Presion y Humedad 2024/350028_202405_PresionHumedad.csv",
+        "Presion y Humedad 2024/350028_202406_PresionHumedad.csv",
+        "Presion y Humedad 2024/350028_202407_PresionHumedad.csv",
+        "Presion y Humedad 2024/350028_202408_PresionHumedad.csv",
+        "Presion y Humedad 2024/350028_202409_PresionHumedad.csv",
+        "Presion y Humedad 2023/350028_202304_PresionHumedad.csv",
+        "Presion y Humedad 2023/350028_202305_PresionHumedad.csv",
+        "Presion y Humedad 2023/350028_202306_PresionHumedad.csv",
+        "Presion y Humedad 2023/350028_202307_PresionHumedad.csv",
+        "Presion y Humedad 2023/350028_202308_PresionHumedad.csv",
+        "Presion y Humedad 2023/350028_202309_PresionHumedad.csv"
     )
 
     println("Comprimiendo miles de registros de la DMC a datos diarios...")
-    val mapaTempMin = procesarTemperatura(archivosTemp)
-    val mapaVientoAvg = procesarPromedios(archivosViento, 6) // El viento está en la columna 6
-    val mapaHumedadAvg = procesarPromedios(archivosHumedad, 5) // La humedad está en la columna 5
+    val mapaTempMin = procesarColumnaDinamica(archivosTemp, "ts", esMinima = true)
+    val mapaVientoAvg = procesarColumnaDinamica(archivosViento, "ffInst", esMinima = false)
+    val mapaHumedadAvg = procesarColumnaDinamica(archivosHumedad, "hr", esMinima = false)
 
     val registrosFinales = mutableListOf<RegistroEntrenamiento>()
 
-    println("Cruzando datos con el archivo diario del SINCA...")
-    // B. Leemos el archivo del SINCA
-    File("datos_250401_250930.csv").useLines { lineas ->
-        lineas.drop(1).forEach { linea ->
-            val columnas = linea.split(";")
-            if (columnas.size >= 3) {
-                val fechaSinca = columnas[0] // Ej: "250401"
-                val mp25String = columnas[2]
+    println("Cruzando datos con los archivos diarios del SINCA...")
 
-                if (fechaSinca.length == 6 && mp25String.isNotBlank()) {
-                    // TRUCO DE TRADUCCIÓN: Transformamos "250401" a "2025-04-01"
-                    val anio = "20" + fechaSinca.substring(0, 2)
-                    val mes = fechaSinca.substring(2, 4)
-                    val dia = fechaSinca.substring(4, 6)
-                    val fechaUniversal = "$anio-$mes-$dia"
+    // B. Creamos una lista con todos los años de humo
+    val archivosSinca = listOf(
+        "datos_230401_230930.csv", // El humo de 2023
+        "datos_240401_240930.csv", // El humo de 2024
+        "datos_250401_250930.csv"  // El humo de 2025
+    )
 
-                    val mp25 = mp25String.replace(",", ".").toDoubleOrNull()
+    // Envolvemos tu código actual en un for para leerlos todos
+    for (archivoHumo in archivosSinca) {
+        File(archivoHumo).useLines { lineas ->
+            lineas.drop(1).forEach { linea ->
+                val columnas = linea.split(";")
+                if (columnas.size >= 3) {
+                    val fechaSinca = columnas[0]
+                    val mp25String = columnas[2]
 
-                    // Buscamos si para esa fecha tenemos los datos de clima comprimidos
-                    val tempMin = mapaTempMin[fechaUniversal]
-                    val vientoAvg = mapaVientoAvg[fechaUniversal]
-                    val humedadAvg = mapaHumedadAvg[fechaUniversal]
+                    if (fechaSinca.length == 6 && mp25String.isNotBlank()) {
+                        // Traducción de fecha (Tu mismo código)
+                        val anio = "20" + fechaSinca.substring(0, 2)
+                        val mes = fechaSinca.substring(2, 4)
+                        val dia = fechaSinca.substring(4, 6)
+                        val fechaUniversal = "$anio-$mes-$dia"
 
-                    // Si tenemos todas las variables de ese día, ¡Hacemos Match!
-                    if (mp25 != null && tempMin != null && vientoAvg != null && humedadAvg != null) {
-                        registrosFinales.add(
-                            RegistroEntrenamiento(fechaUniversal, mp25, tempMin, vientoAvg, humedadAvg)
-                        )
+                        val mp25 = mp25String.replace(",", ".").toDoubleOrNull()
+
+                        val tempMin = mapaTempMin[fechaUniversal]
+                        val vientoAvg = mapaVientoAvg[fechaUniversal]
+                        val humedadAvg = mapaHumedadAvg[fechaUniversal]
+
+                        if (mp25 != null && tempMin != null && vientoAvg != null && humedadAvg != null) {
+                            registrosFinales.add(
+                                RegistroEntrenamiento(fechaUniversal, mp25, tempMin, vientoAvg, humedadAvg)
+                            )
+                        }
                     }
                 }
             }
