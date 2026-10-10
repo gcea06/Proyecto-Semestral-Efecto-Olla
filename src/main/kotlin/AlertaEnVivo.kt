@@ -76,32 +76,37 @@ fun evaluarEfectoOlla(clima: ClimaActual) {
     println("PRONOSTICO IA: Se proyectan ${String.format("%.1f", mp25Proyectado)} ug/m3 de MP2.5")
     println("=======================================================\n")
 
-    // Umbrales oficiales referenciales del Ministerio de Medio Ambiente (ICAP)
+    // 3. Sistema de Alertas
     when {
-        mp25Proyectado >= 110.0 -> println("EMERGENCIA AMBIENTAL: Riesgo inminente de Efecto Olla. Ventilación nula.")
-        mp25Proyectado >= 80.0 -> println("PRE-EMERGENCIA: Alta probabilidad de estancamiento de humo.")
-        mp25Proyectado >= 50.0 -> println("ALERTA AMARILLA: Condiciones propicias para la acumulación de material particulado.")
-        else -> println("AIRE LIMPIO: La atmósfera permite una circulación segura.")
+        mp25Proyectado >= 110.0 -> {
+            println("EMERGENCIA AMBIENTAL DECLARADA")
+            println("Condiciones criticas de Efecto Olla. Ventilacion nula.")
+            println("Accion: Sugerir prohibicion total de humos visibles.")
+        }
+        mp25Proyectado >= 80.0 -> {
+            println("ALERTA DE PRE-EMERGENCIA")
+            println("Alta probabilidad de estancamiento termico.")
+            println("Accion: Sugerir restriccion de calefactores a lena.")
+        }
+        mp25Proyectado >= 50.0 -> {
+            println("ALERTA AMARILLA")
+            println("Condiciones propicias para la acumulación de humo.")
+            println("Accion: Monitoreo preventivo.")
+        }
+        else -> {
+            println("ESTADO NORMAL")
+            println("La atmosfera permite una circulacion segura. Sin riesgo inminente.")
+        }
     }
 }
 
+// 4. El punto de entrada principal
 fun main() {
-    println("=== SISTEMA PREDICTIVO DE CALIDAD DE AIRE - TALCA ===\n")
+    println("=======================================================")
+    println("  SISTEMA PREDICTIVO DE CALIDAD DE AIRE - TALCA 2026")
+    println("=======================================================\n")
 
-    // Aquí el programa inyectará los datos reales de la API de la DMC.
-    // Simulamos un pronóstico crítico de invierno (Madrugada fría, húmeda y sin viento)
-    val climaPronosticado = mapOf(
-        "temperatura" to 1.5,
-        "viento" to 0.2,
-        "humedad" to 92.0
-    )
+    val climaHoy = obtenerClimaDMC()
 
-    println("Evaluando condiciones: Temp ${climaPronosticado["temperatura"]} C | Viento ${climaPronosticado["viento"]} kt | Humedad ${climaPronosticado["humedad"]}%")
-    println("-------------------------------------------------------------------------")
-
-    predecirEfectoOlla(
-        tempActual = climaPronosticado["temperatura"]!!,
-        vientoActual = climaPronosticado["viento"]!!,
-        humedadActual = climaPronosticado["humedad"]!!
-    )
+    evaluarEfectoOlla(climaHoy)
 }
