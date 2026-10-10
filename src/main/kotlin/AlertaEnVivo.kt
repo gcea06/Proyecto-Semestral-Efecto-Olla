@@ -67,7 +67,14 @@ fun evaluarEfectoOlla(clima: ClimaActual) {
             (pesoViento * clima.viento) +
             (pesoHumedad * clima.humedad)
 
-    println("Pronóstico MP2.5: ${String.format("%.1f", mp25Proyectado)} µg/m³")
+    println("\n=======================================================")
+    println("Condiciones Actuales en la Cuenca de Talca:")
+    println("Temperatura: ${clima.temperatura} C")
+    println("Viento:      ${clima.viento} nudos")
+    println("Humedad:     ${clima.humedad} %")
+    println("-------------------------------------------------------")
+    println("PRONOSTICO IA: Se proyectan ${String.format("%.1f", mp25Proyectado)} ug/m3 de MP2.5")
+    println("=======================================================\n")
 
     // Umbrales oficiales referenciales del Ministerio de Medio Ambiente (ICAP)
     when {
