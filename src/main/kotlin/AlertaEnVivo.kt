@@ -63,9 +63,9 @@ fun evaluarEfectoOlla(clima: ClimaActual) {
 
     // Ecuación lineal predictiva
     val mp25Proyectado = constanteBase +
-            (pesoTemperatura * tempActual) +
-            (pesoViento * vientoActual) +
-            (pesoHumedad * humedadActual)
+            (pesoTemperatura * clima.temperatura) +
+            (pesoViento * clima.viento) +
+            (pesoHumedad * clima.humedad)
 
     println("Pronóstico MP2.5: ${String.format("%.1f", mp25Proyectado)} µg/m³")
 
