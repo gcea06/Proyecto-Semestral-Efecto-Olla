@@ -170,6 +170,7 @@ fun main() {
         "Presion y Humedad 2023/350028_202309_PresionHumedad.csv"
     )
 
+    
     println("Comprimiendo miles de registros de la DMC a datos diarios...")
     val mapaTempMin = procesarColumnaDinamica(archivosTemp, "ts", esMinima = true)
     val mapaVientoAvg = procesarColumnaDinamica(archivosViento, "ffInst", esMinima = false)
